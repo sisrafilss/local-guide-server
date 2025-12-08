@@ -1,0 +1,55 @@
+model Booking {
+  id             String        @id @default(uuid())
+  tour           Tour          @relation(fields: [tourId], references: [id], onDelete: Cascade)
+  tourId         String
+  traveler       User          @relation("user_bookings", fields: [travelerId], references: [id], onDelete: Cascade)
+  travelerId     String
+  requestedDate  DateTime      // requested start date/time
+  requestedDurationHours Int?  // optional override if booking shorter/longer
+  guestsCount    Int           @default(1)
+  totalPrice     Decimal       @db.Decimal(10,2)
+  status         BookingStatus @default(PENDING)
+  guideMessage   String?       // message from guide upon acceptance/decline
+  travelerMessage String?      // message from traveler when requesting
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  payment        Payment?      // relation to payment (if paid)
+  review         Review?       // review created after completed
+ 
+ @@map("bookings")
+}
+
+model Review {
+  id          String   @id @default(uuid())
+  tour        Tour     @relation(fields: [tourId], references: [id], onDelete: Cascade)
+  tourId      String
+  author      User     @relation("review_author", fields: [authorId], references: [id], onDelete: Cascade)
+  authorId    String
+  booking     Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  bookingId   String?
+  rating      Int      // 1..5
+  title       String?
+  body        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+    @@map("reviews")
+}
+
+model Payment {
+  id             String        @id @default(uuid())
+  booking        Booking       @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  bookingId      String        @unique
+  payer          User          @relation(fields: [payerId], references: [id], onDelete: Cascade)
+  payerId        String
+  provider       String        // "stripe", "sslcommerz", etc.
+  providerPaymentId String?    // provider transaction id
+  amount         Decimal       @db.Decimal(10,2)
+  currency       String        @default("BDT")
+  status         PaymentStatus @default(PENDING)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  // add refund/settlement fields if needed
+
+    @@map("payments")
+}

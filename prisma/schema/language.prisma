@@ -1,0 +1,32 @@
+model Language {
+  id    String        @id @default(uuid())
+  code  String        @unique // e.g., "en", "es"
+  name  String
+  users UserLanguage[]
+  tours TourLanguage[]
+
+    @@map("languages")
+}
+
+model UserLanguage {
+  id         String   @id @default(uuid())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  language   Language @relation(fields: [languageId], references: [id], onDelete: Cascade)
+  languageId String
+  level      String?  // e.g., "native", "fluent", "basic"
+  @@unique([userId, languageId])
+
+  @@map("user_languages")
+}
+
+model TourLanguage {
+  id         String   @id @default(uuid())
+  tour       Tour     @relation(fields: [tourId], references: [id], onDelete: Cascade)
+  tourId     String
+  language   Language @relation(fields: [languageId], references: [id], onDelete: Cascade)
+  languageId String
+  @@unique([tourId, languageId])
+
+    @@map("tour_languages")
+}

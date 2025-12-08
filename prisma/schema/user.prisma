@@ -1,10 +1,62 @@
 model User {
-    id                 String     @id @default(uuid())
-    email              String     @unique
-    password           String
-    createdAt          DateTime   @default(now())
-    updatedAt          DateTime   @updatedAt
+    id             String        @id @default(uuid())
+  email          String        @unique
+  passwordHash   String
+  name           String
+  profilePicUrl  String?
+  bio            String? 
+  role           Role          @default(TOURIST)
+  languages      UserLanguage[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  // relations
+  guideProfile   GuideProfile? 
+  touristProfile TouristProfile?
+
+  bookings       Booking[]     @relation("user_bookings") // as a traveler
+  reviewsGiven   Review[]      @relation("review_author")
+  payments       Payment[]     // payments initiated by user (traveler)
 
 
     @@map("users")
+}
+
+model GuideProfile {
+  id           String   @id @default(uuid())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String   @unique
+  expertise    String[] // free array of expertise tags e.g. ["History","Nightlife"]
+  dailyRate    Decimal  @db.Decimal(10,2) // price per day
+  verification Verification?
+  tours        Tour[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("guide_profiles")
+}
+
+model TouristProfile {
+  id            String   @id @default(uuid())
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String   @unique
+  preferences   String?  // JSON or text describing travel prefs
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+    @@map("tourist_profiles")
+}
+
+model Verification {
+  id           String   @id @default(uuid())
+  guide        GuideProfile @relation(fields: [guideId], references: [id], onDelete: Cascade)
+  guideId      String   @unique
+  verified     Boolean  @default(false)
+  verifiedAt   DateTime?
+  documents    String[] // URLs to verification docs
+  notes        String?  // admin notes
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+    @@map("verifications")
 }

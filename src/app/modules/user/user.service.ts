@@ -1,19 +1,41 @@
-import { Request } from 'express';
+import { UserRole } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 import { prisma } from '../../shared/prisma';
+import { CreateTouristInput } from './user.interface';
 
-const createPatient = async (req: Request) => {
-  const userData = req.body;
+const createTourist = async (payload: CreateTouristInput) => {
+  const { email, password, name, profilePicUrl, bio } = payload;
 
-  const user = await prisma.user.create({
-    data: {
-      email: userData.email,
-      password: userData.password,
-    },
+  // Check if email already exists
+  const exist = await prisma.user.findUnique({
+    where: { email },
   });
 
-  return user;
+  if (exist) {
+    throw new Error('Email already exists');
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  return await prisma.$transaction(async (tx) => {
+    // Create User
+    const user = await tx.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        name,
+        profilePicUrl,
+        bio,
+        role: UserRole.TOURIST,
+      },
+    });
+
+    return {
+      user,
+    };
+  });
 };
 
 export const UserService = {
-  createPatient,
+  createTourist,
 };

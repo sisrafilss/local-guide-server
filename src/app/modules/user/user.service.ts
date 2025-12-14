@@ -1,5 +1,8 @@
 import { UserRole } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import httpStatus from 'http-status';
+import config from '../../../config';
+import ApiError from '../../errors/ApiError';
 import { prisma } from '../../shared/prisma';
 import { CreateTouristInput } from './user.interface';
 
@@ -12,10 +15,12 @@ const createTourist = async (payload: CreateTouristInput) => {
   });
 
   if (exist) {
-    throw new Error('Email already exists');
+    throw new ApiError(httpStatus.CONFLICT, 'Email already exists');
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  console.log('PAYLOAD', payload);
+
+  const hashedPassword = await bcrypt.hash(password, Number(config.salt_round));
 
   return await prisma.$transaction(async (tx) => {
     // Create User
@@ -30,8 +35,20 @@ const createTourist = async (payload: CreateTouristInput) => {
       },
     });
 
+    const tourst = await tx.tourist.create({
+      data: {
+        userId: user.id,
+      },
+    });
+
     return {
-      user,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      profilePicUrl: user.profilePicUrl,
+      bio: user.bio,
+      id: user.id,
+      touristId: tourst.id,
     };
   });
 };

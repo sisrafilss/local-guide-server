@@ -5,5 +5,6 @@ export interface CreateTouristInput {
   profilePicUrl?: string;
   bio?: string;
   languages?: string[];
+  preferences?: string[];
   travelPreferences?: string;
 }

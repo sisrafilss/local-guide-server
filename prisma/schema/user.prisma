@@ -6,8 +6,80 @@ model User {
   profilePicUrl String?
   bio           String?
   role          UserRole @default(TOURIST)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // relations
+  guide   Guide?
+  tourist Tourist?
 
   @@map("users")
+}
+
+model Guide {
+  id           String        @id @default(uuid())
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String        @unique
+  expertise    String[] // free array of expertise tags e.g. ["History","Nightlife"]
+  dailyRate    Decimal       @db.Decimal(10, 2) // price per day
+  verification Verification?
+  tours        Tour[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@map("guides")
+}
+
+model Tourist {
+  id          String   @id @default(uuid())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String   @unique
+  preferences String? // JSON or text describing travel prefs
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("tourists")
+}
+
+model Verification {
+  id         String    @id @default(uuid())
+  guide      Guide     @relation(fields: [guideId], references: [id], onDelete: Cascade)
+  guideId    String    @unique
+  verified   Boolean   @default(false)
+  verifiedAt DateTime?
+  documents  String[] // URLs to verification docs
+  notes      String? // admin notes
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@map("verifications")
+}
+
+model Tour {
+  id            String  @id @default(uuid())
+  guide         Guide   @relation(fields: [guideId], references: [id], onDelete: Cascade)
+  guideId       String
+  title         String
+  description   String
+  itinerary     String?
+  fee           Decimal @db.Decimal(10, 2)
+  durationHours Int? // approximate duration in hours
+  meetingPoint  String
+  maxGroupSize  Int?
+  category      String // e.g., "Food", "Art", "Adventure" (flexible)
+  city          String
+  // images         TourImage[]
+
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // bookings       Booking[]
+  // reviews        Review[]     // aggregated reviews for this tour (from bookings)
+  // @@index([city])
+  // @@index([category])
+  // @@index([fee])
+
+  @@map("tours")
 }

@@ -13,6 +13,7 @@ model User {
   // relations
   guide   Guide?
   tourist Tourist?
+  admin   Admin?
 
   @@map("users")
 }
@@ -21,7 +22,7 @@ model Guide {
   id           String        @id @default(uuid())
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       String        @unique
-  expertise    String[] // free array of expertise tags e.g. ["History","Nightlife"]
+  expertise    String[]      @default([]) // free array of expertise tags e.g. ["History","Nightlife"]
   dailyRate    Decimal       @db.Decimal(10, 2) // price per day
   verification Verification?
   tours        Tour[]
@@ -29,6 +30,17 @@ model Guide {
   updatedAt    DateTime      @updatedAt
 
   @@map("guides")
+}
+
+model Admin {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String   @unique
+  tours     Tour[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("admins")
 }
 
 model Tourist {
@@ -80,6 +92,8 @@ model Tour {
   // @@index([city])
   // @@index([category])
   // @@index([fee])
+  admin   Admin?  @relation(fields: [adminId], references: [id])
+  adminId String?
 
   @@map("tours")
 }

@@ -11,7 +11,7 @@ const createTourist = catchAsync(async (req: Request, res: Response) => {
     profilePicUrl: req.file?.path,
   };
 
-  const result = await UserService.createTourist(payload);
+  const result = await UserService.createGuide(payload);
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -21,6 +21,39 @@ const createTourist = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const createGuide = catchAsync(async (req: Request, res: Response) => {
+  const payload = {
+    ...req.body,
+    profilePicUrl: req.file?.path,
+  };
+
+  const result = await UserService.createGuide(payload);
+
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: 'Guide created successfully',
+    data: result,
+  });
+});
+const createAdmin = catchAsync(async (req: Request, res: Response) => {
+  const payload = {
+    ...req.body,
+    profilePicUrl: req.file?.path,
+  };
+
+  const result = await UserService.createAdmin(payload);
+
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: 'Admin created successfully',
+    data: result,
+  });
+});
+
 export const UserController = {
   createTourist,
+  createGuide,
+  createAdmin,
 };

@@ -8,3 +8,29 @@ export interface CreateTouristInput {
   preferences?: string[];
   travelPreferences?: string;
 }
+export interface CreateGuideInput {
+  email: string;
+  password: string;
+  name: string;
+  profilePicUrl?: string;
+  expertise?: string[];
+  dailyRate: number;
+  languages?: string[];
+}
+
+export interface CreateGuideInput {
+  email: string;
+  password: string;
+  name: string;
+  profilePicUrl?: string;
+  expertise?: string[];
+  dailyRate: number;
+  languages?: string[];
+}
+
+export interface CreateAdminInput {
+  email: string;
+  password: string;
+  name: string;
+  profilePicUrl?: string;
+}

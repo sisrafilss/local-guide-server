@@ -3,3 +3,9 @@ enum UserRole {
     GUIDE
     ADMIN
 }
+
+enum UserStatus {
+    ACTIVE
+    INACTIVE
+    DELETED
+}

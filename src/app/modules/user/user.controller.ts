@@ -1,8 +1,7 @@
-import httpStatus from 'http-status';
-
 import { Request, Response } from 'express';
-import catchAsync from '../../shared/catchAsync';
-import sendResponse from '../../shared/sendResponse';
+import httpStatus from 'http-status';
+import catchAsync from '../../utils/catchAsync';
+import sendResponse from '../../utils/sendResponse';
 import { UserService } from './user.service';
 
 const createTourist = catchAsync(async (req: Request, res: Response) => {

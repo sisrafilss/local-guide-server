@@ -1,5 +1,7 @@
+import { UserRole } from '@prisma/client';
 import express from 'express';
 import { multerUpload } from '../../../config/multer.config';
+import checkAuth from '../../middlewares/checkAuth';
 import { validateRequest } from '../../middlewares/validateRequest';
 import { UserController } from './user.controller';
 import {
@@ -28,6 +30,7 @@ router.post(
 // POST /api/users/create-admin
 router.post(
   '/create-admin',
+  checkAuth(UserRole.ADMIN),
   multerUpload.single('file'),
   validateRequest(createAdminSchema),
   UserController.createAdmin

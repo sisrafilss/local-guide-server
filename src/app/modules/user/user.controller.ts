@@ -10,7 +10,7 @@ const createTourist = catchAsync(async (req: Request, res: Response) => {
     profilePicUrl: req.file?.path,
   };
 
-  const result = await UserService.createGuide(payload);
+  const result = await UserService.createTourist(payload);
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,

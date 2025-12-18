@@ -14,6 +14,25 @@ const login = async (payload: { email: string; password: string }) => {
       email: payload.email,
       status: UserStatus.ACTIVE,
     },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      role: true,
+      status: true,
+      password: true,
+      profilePicUrl: true,
+      createdAt: true,
+
+      guide: {
+        select: {
+          id: true,
+          expertise: true,
+          dailyRate: true,
+          verificationStatus: true,
+        },
+      },
+    },
   });
 
   const isCorrectPassword = await bcrypt.compare(

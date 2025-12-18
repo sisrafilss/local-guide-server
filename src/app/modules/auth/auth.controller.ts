@@ -7,7 +7,7 @@ import { AuthService } from './auth.service';
 
 const login = catchAsync(async (req: Request, res: Response) => {
   const result = await AuthService.login(req.body);
-  const { accessToken, refreshToken, ...userInfo } = result;
+  const { accessToken, refreshToken, userData } = result;
 
   res.cookie('accessToken', accessToken, {
     secure: true,
@@ -26,7 +26,7 @@ const login = catchAsync(async (req: Request, res: Response) => {
     statusCode: httpStatus.OK,
     success: true,
     message: 'User loggedin successfully!',
-    data: { ...userInfo },
+    data: { ...userData },
   });
 });
 

@@ -1,11 +1,42 @@
 enum UserRole {
-    TOURIST
-    GUIDE
-    ADMIN
+  TOURIST
+  GUIDE
+  ADMIN
 }
 
 enum UserStatus {
-    ACTIVE
-    INACTIVE
-    DELETED
+  ACTIVE
+  INACTIVE
+  DELETED
+}
+
+enum ListingCategory {
+  FOOD
+  HISTORY
+  PHOTOGRAPHY
+  ADVENTURE
+  NIGHTLIFE
+  SHOPPING
+  CUSTOM
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  REJECTED
+}
+
+enum PaymentGateway {
+  STRIPE
+  SSLCOMMERZ
+  MANUAL
+}
+
+enum PaymentStatus {
+  INITIATED
+  SUCCEEDED
+  FAILED
+  REFUNDED
 }

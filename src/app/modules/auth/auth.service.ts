@@ -44,13 +44,13 @@ const login = async (payload: { email: string; password: string }) => {
   }
 
   const accessToken = generateToken(
-    { email: user.email, role: user.role },
+    { id: user.id, email: user.email, role: user.role },
     config.jwt.jwt_secret as Secret,
     config.jwt.expires_in as string
   );
 
   const refreshToken = generateToken(
-    { email: user.email, role: user.role },
+    { id: user.id, email: user.email, role: user.role },
     config.jwt.refresh_token_secret as Secret,
     config.jwt.refresh_token_expires_in as string
   );

@@ -11,6 +11,7 @@ export const TourCategoryEnm = z.enum([
 ]);
 
 export const CreateTourZodSchema = z.object({
+  id: z.uuid().optional(),
   guideId: z.string(),
 
   title: z.string().min(5, 'Title must be at least 5 characters').max(120),
@@ -40,4 +41,21 @@ export const CreateTourZodSchema = z.object({
   active: z.boolean().optional().default(true),
 });
 
+export const UpdateTourZodSchema = z.object({
+  title: z.string().min(5).max(120).optional(),
+  description: z.string().min(20).optional(),
+  itinerary: z.string().optional(),
+  price: z.number().positive().max(100000).optional(),
+  durationMin: z.number().int().positive().optional(),
+  meetingPoint: z.string().min(3).optional(),
+  maxGroupSize: z.number().int().min(1).max(50).optional(),
+  category: TourCategoryEnm.optional(),
+  city: z.string().min(2).optional(),
+  lat: z.number().min(-90).max(90).optional(),
+  lng: z.number().min(-180).max(180).optional(),
+  images: z.array(z.url()).optional(),
+  active: z.boolean().optional(),
+});
+
 export type CreateTourInput = z.infer<typeof CreateTourZodSchema>;
+export type UpdateTourInput = z.infer<typeof UpdateTourZodSchema>;

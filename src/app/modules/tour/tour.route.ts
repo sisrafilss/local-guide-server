@@ -3,7 +3,7 @@ import express from 'express';
 import checkAuth from '../../middlewares/checkAuth';
 import { validateRequest } from '../../middlewares/validateRequest';
 import { TourController } from './tour.controller';
-import { CreateTourZodSchema } from './tour.validation';
+import { CreateTourZodSchema, UpdateTourZodSchema } from './tour.validation';
 
 const router = express.Router();
 
@@ -13,6 +13,14 @@ router.post(
   checkAuth(UserRole.GUIDE),
   validateRequest(CreateTourZodSchema),
   TourController.createTour
+);
+
+// POST /api/tours/update-tour/:id
+router.patch(
+  '/:id',
+  checkAuth(UserRole.GUIDE),
+  validateRequest(UpdateTourZodSchema),
+  TourController.updateTour
 );
 
 export const tourRoutes = router;

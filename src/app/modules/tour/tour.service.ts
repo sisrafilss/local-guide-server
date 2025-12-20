@@ -1,7 +1,8 @@
-import { Prisma, PrismaClient, UserStatus } from '@prisma/client';
+import { Listing, Prisma, PrismaClient, UserStatus } from '@prisma/client';
 import { IPaginationOptions } from '../../interfaces/pagination';
 import { calculatePagination } from '../../utils/calculatePagination';
 import { tourSearchableFields } from './tour.constant';
+import { GetAllToursParams } from './tour.interface';
 import { CreateTourInput, UpdateTourInput } from './tour.validation';
 
 const prisma = new PrismaClient();
@@ -80,19 +81,6 @@ const updateTour = async (
 
   return updatedTour;
 };
-
-interface GetAllToursParams {
-  searchTerm?: string;
-  city?: string;
-  category?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  minDuration?: number;
-  maxDuration?: number;
-  active?: boolean;
-  page?: number;
-  limit?: number;
-}
 
 const getAllTours = async (
   params: GetAllToursParams,
@@ -175,8 +163,31 @@ const getAllTours = async (
   };
 };
 
+const getTourById = async (id: string): Promise<Listing | null> => {
+  const result = await prisma.listing.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      guide: true,
+    },
+  });
+  return result;
+};
+
+const deleteTourById = async (id: string): Promise<Listing> => {
+  const result = await prisma.listing.delete({
+    where: {
+      id,
+    },
+  });
+  return result;
+};
+
 export const TourService = {
   createTour,
   updateTour,
   getAllTours,
+  getTourById,
+  deleteTourById,
 };

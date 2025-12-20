@@ -7,20 +7,23 @@ import { CreateTourZodSchema, UpdateTourZodSchema } from './tour.validation';
 
 const router = express.Router();
 
-// POST /api/tours/create-tour
+// POST /api/tours
 router.post(
-  '/create-tour',
+  '/',
   checkAuth(UserRole.GUIDE),
   validateRequest(CreateTourZodSchema),
   TourController.createTour
 );
 
-// POST /api/tours/update-tour/:id
+// PATCH /api/tours/:id
 router.patch(
   '/:id',
   checkAuth(UserRole.GUIDE),
   validateRequest(UpdateTourZodSchema),
   TourController.updateTour
 );
+
+// get /api/tours
+router.get('/', checkAuth(UserRole.GUIDE), TourController.getAllTours);
 
 export const tourRoutes = router;

@@ -2,7 +2,9 @@ import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 import { IAuthUser } from '../../interfaces/common';
 import catchAsync from '../../utils/catchAsync';
+import pick from '../../utils/pick';
 import sendResponse from '../../utils/sendResponse';
+import { tourFilterableFields } from './tour.constant';
 import { TourService } from './tour.service';
 
 const createTour = catchAsync(async (req: Request, res: Response) => {
@@ -45,7 +47,23 @@ const updateTour = catchAsync(
   }
 );
 
+const getAllTours = catchAsync(async (req: Request, res: Response) => {
+  const filters = pick(req.query, tourFilterableFields);
+  const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
+
+  const result = await TourService.getAllTours(filters, options);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Tours data fetched!',
+    meta: result.meta,
+    data: result.data,
+  });
+});
+
 export const TourController = {
   createTour,
   updateTour,
+  getAllTours,
 };

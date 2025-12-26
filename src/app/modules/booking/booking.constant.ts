@@ -1,2 +1,2 @@
 // booking.constant.ts
-export const bookingSearchableFields = ['status'] as const;
+export const bookingSearchableFields = ['status'];

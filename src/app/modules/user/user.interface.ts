@@ -34,3 +34,10 @@ export interface CreateAdminInput {
   name: string;
   profilePicUrl?: string;
 }
+
+export type IPaginationOptions = {
+  page?: number;
+  limit?: number;
+  sortBy?: string | undefined;
+  sortOrder?: string | undefined;
+};

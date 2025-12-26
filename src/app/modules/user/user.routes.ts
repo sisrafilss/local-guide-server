@@ -12,6 +12,8 @@ import {
 
 const router = express.Router();
 
+router.get('/', checkAuth(UserRole.ADMIN), UserController.getAllUsers);
+
 // POST /api/users/create-tourist
 router.post(
   '/create-tourist',
@@ -27,6 +29,7 @@ router.post(
   validateRequest(createGuideSchema),
   UserController.createGuide
 );
+
 // POST /api/users/create-admin
 router.post(
   '/create-admin',
@@ -34,6 +37,13 @@ router.post(
   multerUpload.single('file'),
   validateRequest(createAdminSchema),
   UserController.createAdmin
+);
+
+// POST /api/users/:ID
+router.delete(
+  '/:id',
+  checkAuth(...Object.values(UserRole)),
+  UserController.deleteUser
 );
 
 export const userRoutes = router;

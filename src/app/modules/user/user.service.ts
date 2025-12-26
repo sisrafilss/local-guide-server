@@ -1,9 +1,13 @@
-import { UserRole } from '@prisma/client';
+import { Prisma, UserRole } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import httpStatus from 'http-status';
+import { JwtPayload } from 'jsonwebtoken';
 import config from '../../../config';
 import ApiError from '../../errors/ApiError';
+import { IPaginationOptions } from '../../interfaces/pagination';
 import { prisma } from '../../shared/prisma';
+import { calculatePagination } from '../../utils/calculatePagination';
+import { userSearchAbleFields } from './user.constant';
 import {
   CreateAdminInput,
   CreateGuideInput,
@@ -144,8 +148,112 @@ const createAdmin = async (payload: CreateAdminInput) => {
   });
 };
 
+const getAllUsers = async (params: any, options: IPaginationOptions) => {
+  const { page, limit, skip } = calculatePagination(options);
+  const { searchTerm, ...filterData } = params;
+
+  const andConditions: Prisma.UserWhereInput[] = [];
+
+  if (params.searchTerm) {
+    andConditions.push({
+      OR: userSearchAbleFields.map((field) => ({
+        [field]: {
+          contains: params.searchTerm,
+          mode: 'insensitive',
+        },
+      })),
+    });
+  }
+
+  if (Object.keys(filterData).length > 0) {
+    andConditions.push({
+      AND: Object.keys(filterData).map((key) => ({
+        [key]: {
+          equals: (filterData as any)[key],
+        },
+      })),
+    });
+  }
+
+  const whereConditions: Prisma.UserWhereInput =
+    andConditions.length > 0 ? { AND: andConditions } : {};
+
+  const result = await prisma.user.findMany({
+    where: whereConditions,
+    skip,
+    take: limit,
+    orderBy:
+      options.sortBy && options.sortOrder
+        ? {
+            [options.sortBy]: options.sortOrder,
+          }
+        : {
+            createdAt: 'desc',
+          },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      profilePicUrl: true,
+      role: true,
+      status: true,
+      createdAt: true,
+      updatedAt: true,
+      admin: true,
+      tourist: true,
+      guide: true,
+    },
+  });
+
+  const total = await prisma.user.count({
+    where: whereConditions,
+  });
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
+};
+
+const deleteUser = async (userId: string, authUser: JwtPayload) => {
+  // 1. Check if user exists
+  const existingUser = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!existingUser) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  }
+
+  // 2. Authorization check
+  const isAdmin = authUser.role === UserRole.ADMIN;
+  const isSelf = authUser.id === userId;
+
+  if (!isAdmin && !isSelf) {
+    throw new ApiError(
+      httpStatus.FORBIDDEN,
+      'You are not allowed to delete this user'
+    );
+  }
+
+  // 3. Delete user (relations handled by cascade or manually)
+  await prisma.user.delete({
+    where: { id: userId },
+  });
+
+  return {
+    message: 'User deleted successfully',
+  };
+};
+
 export const UserService = {
   createTourist,
   createGuide,
   createAdmin,
+  getAllUsers,
+  deleteUser,
 };

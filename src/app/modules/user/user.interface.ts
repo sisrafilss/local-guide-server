@@ -7,6 +7,9 @@ export interface CreateTouristInput {
   languages?: string[];
   preferences?: string[];
   travelPreferences?: string;
+  address: string;
+  phone: string;
+  gender: 'MALE' | 'FEMALE';
 }
 export interface CreateGuideInput {
   email: string;
@@ -16,16 +19,9 @@ export interface CreateGuideInput {
   expertise?: string[];
   dailyRate: number;
   languages?: string[];
-}
-
-export interface CreateGuideInput {
-  email: string;
-  password: string;
-  name: string;
-  profilePicUrl?: string;
-  expertise?: string[];
-  dailyRate: number;
-  languages?: string[];
+  address: string;
+  phone: string;
+  gender: 'MALE' | 'FEMALE';
 }
 
 export interface CreateAdminInput {
@@ -33,6 +29,9 @@ export interface CreateAdminInput {
   password: string;
   name: string;
   profilePicUrl?: string;
+  address: string;
+  phone: string;
+  gender: 'MALE' | 'FEMALE';
 }
 
 export type IPaginationOptions = {

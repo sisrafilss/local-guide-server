@@ -15,7 +15,8 @@ import {
 } from './user.interface';
 
 const createTourist = async (payload: CreateTouristInput) => {
-  const { email, password, name, profilePicUrl, bio } = payload;
+  const { email, password, name, profilePicUrl, bio, address, phone, gender } =
+    payload;
 
   // Check if email already exists
   const exist = await prisma.user.findUnique({
@@ -38,6 +39,9 @@ const createTourist = async (payload: CreateTouristInput) => {
         profilePicUrl,
         bio,
         role: UserRole.TOURIST,
+        address,
+        phone,
+        gender,
       },
     });
 
@@ -55,13 +59,25 @@ const createTourist = async (payload: CreateTouristInput) => {
       bio: user.bio,
       id: user.id,
       touristId: tourst.id,
+      address: user.address,
+      phone: user.phone,
+      gender: user.gender,
     };
   });
 };
 
 const createGuide = async (payload: CreateGuideInput) => {
-  const { email, password, name, profilePicUrl, expertise, dailyRate } =
-    payload;
+  const {
+    email,
+    password,
+    name,
+    profilePicUrl,
+    expertise,
+    dailyRate,
+    address,
+    phone,
+    gender,
+  } = payload;
 
   // Check if email already exists
   const exist = await prisma.user.findUnique({
@@ -83,6 +99,9 @@ const createGuide = async (payload: CreateGuideInput) => {
         name,
         profilePicUrl,
         role: UserRole.GUIDE,
+        address,
+        phone,
+        gender,
       },
     });
 
@@ -101,12 +120,16 @@ const createGuide = async (payload: CreateGuideInput) => {
       profilePicUrl: user.profilePicUrl,
       id: user.id,
       guideId: guide.id,
+      address: user.address,
+      phone: user.phone,
+      gender: user.gender,
     };
   });
 };
 
 const createAdmin = async (payload: CreateAdminInput) => {
-  const { email, password, name, profilePicUrl } = payload;
+  const { email, password, name, profilePicUrl, address, phone, gender } =
+    payload;
 
   // Check if email already exists
   const exist = await prisma.user.findUnique({
@@ -128,6 +151,9 @@ const createAdmin = async (payload: CreateAdminInput) => {
         name,
         profilePicUrl,
         role: UserRole.ADMIN,
+        address,
+        phone,
+        gender,
       },
     });
 
@@ -144,6 +170,9 @@ const createAdmin = async (payload: CreateAdminInput) => {
       profilePicUrl: user.profilePicUrl,
       id: user.id,
       adminId: admin.id,
+      address: user.address,
+      phone: user.phone,
+      gender: user.gender,
     };
   });
 };

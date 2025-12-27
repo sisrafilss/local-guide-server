@@ -40,3 +40,8 @@ enum PaymentStatus {
   FAILED
   REFUNDED
 }
+
+enum Gender {
+  MALE
+  FEMALE
+}

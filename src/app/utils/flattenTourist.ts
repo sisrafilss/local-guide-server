@@ -10,10 +10,14 @@ export const flattenTourist = (tourist: Tourist & { user: any }) => {
     userId: tourist.userId, // ensure userId is explicitly at root
     name: tourist.user.name,
     email: tourist.user.email,
+    phone: tourist.user.phone,
+    address: tourist.user.address,
+    gender: tourist.user.gender,
     profilePicUrl: tourist.user.profilePicUrl,
     bio: tourist.user.bio,
     role: tourist.user.role,
     status: tourist.user.status,
+
     user: undefined, // optionally remove nested user to avoid duplication
   };
 };

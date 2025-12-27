@@ -39,6 +39,28 @@ const getAllTourists = catchAsync(
   }
 );
 
+const updateTouristById = catchAsync(
+  async (req: Request & { user?: JwtPayload }, res: Response) => {
+    const payload = {
+      ...req.body,
+      profilePicUrl: req.file?.path,
+    };
+    const { id } = req.params;
+
+    const result = await TouristService.updateTouristById(
+      id,
+      payload,
+      req.user as JwtPayload
+    );
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Tourist updated successfully',
+      data: result,
+    });
+  }
+);
+
 const deleteTouristById = catchAsync(
   async (req: Request & { user?: JwtPayload }, res: Response) => {
     const { id } = req.params;
@@ -60,4 +82,5 @@ export const TouristController = {
   deleteTouristById,
   getAllTourists,
   getSingleTouristById,
+  updateTouristById,
 };

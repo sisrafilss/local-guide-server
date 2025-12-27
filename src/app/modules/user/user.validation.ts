@@ -2,11 +2,21 @@ import { z } from 'zod';
 
 export const createTouristSchema = z.object({
   email: z.email('Invalid email'),
+
   password: z.string().min(6, 'Password must be at least 6 characters'),
-  name: z.string().min(2),
-  bio: z.string().optional(),
-  languages: z.array(z.string()).optional(),
-  travelPreferences: z.string().optional(),
+
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+
+  bio: z.string().max(500, 'Bio must be at most 500 characters').optional(),
+
+  address: z.string().min(5, 'Address must be at least 5 characters'),
+
+  phone: z
+    .string()
+    .regex(/^(\+?\d{1,4}[\s-]?)?(\d{10,15})$/, 'Invalid phone number')
+    .optional(),
+
+  gender: z.enum(['MALE', 'FEMALE']).optional(),
 });
 
 export const createGuideSchema = z.object({
@@ -22,6 +32,14 @@ export const createGuideSchema = z.object({
   name: z
     .string({ message: 'Name is required' })
     .min(2, 'Name must be at least 2 characters'),
+  address: z.string().min(5, 'Address must be at least 5 characters'),
+
+  phone: z
+    .string()
+    .regex(/^(\+?\d{1,4}[\s-]?)?(\d{10,15})$/, 'Invalid phone number')
+    .optional(),
+
+  gender: z.enum(['MALE', 'FEMALE']).optional(),
 
   // Guide table fields
   expertise: z
@@ -50,4 +68,12 @@ export const createAdminSchema = z.object({
   name: z
     .string({ message: 'Name is required' })
     .min(2, 'Name must be at least 2 characters'),
+  address: z.string().min(5, 'Address must be at least 5 characters'),
+
+  phone: z
+    .string()
+    .regex(/^(\+?\d{1,4}[\s-]?)?(\d{10,15})$/, 'Invalid phone number')
+    .optional(),
+
+  gender: z.enum(['MALE', 'FEMALE']).optional(),
 });

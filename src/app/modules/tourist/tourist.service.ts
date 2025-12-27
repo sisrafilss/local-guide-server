@@ -6,7 +6,10 @@ import { IPaginationOptions } from '../../interfaces/pagination';
 import { prisma } from '../../shared/prisma';
 import { calculatePagination } from '../../utils/calculatePagination';
 import { flattenTourist, flattenTourists } from '../../utils/flattenTourist';
-import { GetAllTouristsParams } from './tourist.interface';
+import {
+  GetAllTouristsParams,
+  UpdateTouristPayload,
+} from './tourist.interface';
 
 const getAllTourists = async (
   params: GetAllTouristsParams,
@@ -78,6 +81,9 @@ const getAllTourists = async (
           bio: true,
           role: true,
           status: true,
+          gender: true,
+          phone: true,
+          address: true,
         },
       },
     },
@@ -110,6 +116,9 @@ export const getSingleTouristById = async (touristId: string) => {
           id: true,
           name: true,
           email: true,
+          gender: true,
+          phone: true,
+          address: true,
           profilePicUrl: true,
           bio: true,
           role: true,
@@ -127,7 +136,11 @@ export const getSingleTouristById = async (touristId: string) => {
   return flattenTourist(tourist);
 };
 
-const deleteTouristById = async (touristId: string, authUser: JwtPayload) => {
+const updateTouristById = async (
+  touristId: string,
+  payload: UpdateTouristPayload,
+  authUser: JwtPayload
+) => {
   // 1. Check if tourist exists
   const tourist = await prisma.tourist.findUnique({
     where: { id: touristId },
@@ -137,7 +150,71 @@ const deleteTouristById = async (touristId: string, authUser: JwtPayload) => {
     },
   });
 
-  console.log('TOURIST', tourist);
+  if (!tourist) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Tourist not found');
+  }
+
+  // 2. Authorization check
+  const isAdmin = authUser.role === UserRole.ADMIN;
+  const isOwner = authUser.id === tourist.userId;
+
+  if (!isAdmin && !isOwner) {
+    throw new ApiError(
+      httpStatus.FORBIDDEN,
+      'You are not allowed to update this tourist'
+    );
+  }
+
+  // 3. Split payload
+  const { preferences, name, profilePicUrl, bio } = payload;
+
+  // 4. Update using transaction
+  const updatedTourist = await prisma.$transaction(async (tx) => {
+    if (preferences !== undefined) {
+      await tx.tourist.update({
+        where: { id: touristId },
+        data: { preferences },
+      });
+    }
+
+    if (name || profilePicUrl || bio) {
+      await tx.user.update({
+        where: { id: tourist.userId },
+        data: {
+          ...(name && { name }),
+          ...(profilePicUrl && { profilePicUrl }),
+          ...(bio && { bio }),
+        },
+      });
+    }
+
+    return tx.tourist.findUnique({
+      where: { id: touristId },
+      include: {
+        user: true,
+      },
+    });
+  });
+
+  if (!updatedTourist) {
+    throw new ApiError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      'Failed to update tourist'
+    );
+  }
+
+  return flattenTourist(updatedTourist);
+};
+
+const deleteTouristById = async (touristId: string, authUser: JwtPayload) => {
+  // 1. Check if tourist exists
+  const tourist = await prisma.tourist.findUnique({
+    where: { id: touristId },
+    select: {
+      id: true,
+      userId: true,
+    },
+  });
 
   if (!tourist) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Tourist not found');
@@ -175,4 +252,5 @@ export const TouristService = {
   deleteTouristById,
   getSingleTouristById,
   getAllTourists,
+  updateTouristById,
 };

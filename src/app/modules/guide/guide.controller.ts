@@ -4,42 +4,42 @@ import { JwtPayload } from 'jsonwebtoken';
 import catchAsync from '../../utils/catchAsync';
 import pick from '../../utils/pick';
 import sendResponse from '../../utils/sendResponse';
-import { touristFilterableFields } from './tourist.constant';
-import { TouristService } from './tourist.service';
+import { guidesFilterableFields } from './guide.constant';
+import { GuideService } from './guide.service';
 
-const getSingleTouristById = catchAsync(
+const getAllGuides = catchAsync(
   async (req: Request & { user?: JwtPayload }, res: Response) => {
-    const { id } = req.params;
-
-    const result = await TouristService.getSingleTouristById(id);
-
-    sendResponse(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message: 'Tourist data fetched!',
-      data: result,
-    });
-  }
-);
-
-const getAllTourists = catchAsync(
-  async (req: Request & { user?: JwtPayload }, res: Response) => {
-    const filters = pick(req.query, touristFilterableFields);
+    const filters = pick(req.query, guidesFilterableFields);
     const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
 
-    const result = await TouristService.getAllTourists(filters, options);
+    const result = await GuideService.getAllGuides(filters, options);
 
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: 'Tourists data fetched!',
+      message: 'Guides data fetched!',
       meta: result.meta,
       data: result.data,
     });
   }
 );
 
-const updateTouristById = catchAsync(
+const getSingleGuideById = catchAsync(
+  async (req: Request & { user?: JwtPayload }, res: Response) => {
+    const { id } = req.params;
+
+    const result = await GuideService.getSingleGuideById(id);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Guide data fetched!',
+      data: result,
+    });
+  }
+);
+
+const updateGuideById = catchAsync(
   async (req: Request & { user?: JwtPayload }, res: Response) => {
     const payload = {
       ...req.body,
@@ -47,7 +47,7 @@ const updateTouristById = catchAsync(
     };
     const { id } = req.params;
 
-    const result = await TouristService.updateTouristById(
+    const result = await GuideService.updateGuideById(
       id,
       payload,
       req.user as JwtPayload
@@ -55,32 +55,31 @@ const updateTouristById = catchAsync(
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: 'Tourist updated successfully',
+      message: 'Guide updated successfully',
       data: result,
     });
   }
 );
 
-const deleteTouristById = catchAsync(
+const deleteGuidetById = catchAsync(
   async (req: Request & { user?: JwtPayload }, res: Response) => {
     const { id } = req.params;
-
-    const result = await TouristService.deleteTouristById(
+    const result = await GuideService.deleteGuidetById(
       id,
       req.user as JwtPayload
     );
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: 'Tourist deleted successfully',
+      message: 'Guide Deleted Successfully!',
       data: result,
     });
   }
 );
 
-export const TouristController = {
-  deleteTouristById,
-  getAllTourists,
-  getSingleTouristById,
-  updateTouristById,
+export const GuideController = {
+  getAllGuides,
+  getSingleGuideById,
+  deleteGuidetById,
+  updateGuideById,
 };

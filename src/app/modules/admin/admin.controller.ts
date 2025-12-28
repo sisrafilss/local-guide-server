@@ -4,84 +4,93 @@ import { JwtPayload } from 'jsonwebtoken';
 import catchAsync from '../../utils/catchAsync';
 import pick from '../../utils/pick';
 import sendResponse from '../../utils/sendResponse';
-import { guidesFilterableFields } from './guide.constant';
-import { GuideService } from './guide.service';
+import { GetAllTouristsParams } from '../tourist/tourist.interface';
+import { adminsFilterableFields } from './admin.constant';
+import { AdminService } from './admin.service';
 
-const getAllGuides = catchAsync(
+// -------------------- GET ALL ADMINS --------------------
+const getAllAdmins = catchAsync(
   async (req: Request & { user?: JwtPayload }, res: Response) => {
-    const filters = pick(req.query, guidesFilterableFields);
+    const filters: GetAllTouristsParams = pick(
+      req.query,
+      adminsFilterableFields
+    );
     const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
 
-    const result = await GuideService.getAllGuides(filters, options);
+    const result = await AdminService.getAllAdmins(filters, options);
 
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: 'Guides data fetched!',
+      message: 'Admins data fetched!',
       meta: result.meta,
       data: result.data,
     });
   }
 );
 
-const getSingleGuideById = catchAsync(
+// -------------------- GET SINGLE ADMIN --------------------
+const getSingleAdminById = catchAsync(
   async (req: Request & { user?: JwtPayload }, res: Response) => {
     const { id } = req.params;
 
-    const result = await GuideService.getSingleGuideById(id);
+    const result = await AdminService.getSingleAdminById(id);
 
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: 'Guide data fetched!',
+      message: 'Admin data fetched!',
       data: result,
     });
   }
 );
 
-const updateGuideById = catchAsync(
+// -------------------- UPDATE ADMIN --------------------
+const updateAdminById = catchAsync(
   async (req: Request & { user?: JwtPayload }, res: Response) => {
     const payload = {
       ...req.body,
-      profilePicUrl: req.file?.path,
+      profilePicUrl: req.file?.path, // if admins can upload profile pictures
     };
     const { id } = req.params;
 
-    const result = await GuideService.updateGuideById(
+    const result = await AdminService.updateAdminById(
       id,
       payload,
       req.user as JwtPayload
     );
+
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: 'Guide updated successfully',
+      message: 'Admin updated successfully',
       data: result,
     });
   }
 );
 
-const deleteGuidetById = catchAsync(
+// -------------------- DELETE ADMIN --------------------
+const deleteAdminById = catchAsync(
   async (req: Request & { user?: JwtPayload }, res: Response) => {
-    console.log('DELETE GUIDE API HIT');
-
     const { id } = req.params;
-    const result = await GuideService.deleteGuidetById(
+
+    const result = await AdminService.deleteAdminById(
       id,
       req.user as JwtPayload
     );
+
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: 'Guide Deleted Successfully!',
+      message: 'Admin deleted successfully',
       data: result,
     });
   }
 );
 
-export const GuideController = {
-  getAllGuides,
-  getSingleGuideById,
-  deleteGuidetById,
-  updateGuideById,
+export const AdminController = {
+  getAllAdmins,
+  getSingleAdminById,
+  updateAdminById,
+  deleteAdminById,
 };

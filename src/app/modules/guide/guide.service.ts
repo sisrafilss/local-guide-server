@@ -264,9 +264,63 @@ const deleteGuidetById = async (guideId: string, authUser: JwtPayload) => {
   };
 };
 
+interface IGuideStats {
+  totalGuides: number;
+  verifiedGuides: number;
+  unverifiedGuides: number;
+  averageDailyRate: number;
+  expertiseBreakdown: Record<string, number>;
+}
+
+const getGuideStats = async (): Promise<IGuideStats> => {
+  // 1️⃣ Total guides
+  const totalGuides = await prisma.guide.count();
+
+  // 2️⃣ Verified / Unverified guides
+  const verifiedGuides = await prisma.guide.count({
+    where: { verificationStatus: true },
+  });
+
+  const unverifiedGuides = totalGuides - verifiedGuides;
+
+  // 3️⃣ Average daily rate
+  const avgDailyRateResult = await prisma.guide.aggregate({
+    _avg: {
+      dailyRate: true,
+    },
+  });
+
+  const averageDailyRate = Number(avgDailyRateResult._avg.dailyRate ?? 0);
+
+  // 4️⃣ Expertise breakdown
+  const expertiseGroups = await prisma.guide.groupBy({
+    by: ['expertise'],
+    _count: {
+      id: true,
+    },
+  });
+
+  const expertiseBreakdown: Record<string, number> = {};
+  expertiseGroups.forEach((group) => {
+    const key = Array.isArray(group.expertise)
+      ? group.expertise.join(', ')
+      : group.expertise ?? 'Unknown';
+    expertiseBreakdown[key] = group._count.id;
+  });
+
+  return {
+    totalGuides,
+    verifiedGuides,
+    unverifiedGuides,
+    averageDailyRate,
+    expertiseBreakdown,
+  };
+};
+
 export const GuideService = {
   getAllGuides,
   getSingleGuideById,
   deleteGuidetById,
   updateGuideById,
+  getGuideStats,
 };

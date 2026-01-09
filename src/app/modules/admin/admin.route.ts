@@ -11,6 +11,12 @@ const router = express.Router();
 // -------------------- GET ALL ADMINS --------------------
 router.get('/', checkAuth(UserRole.ADMIN), AdminController.getAllAdmins);
 
+router.get(
+  '/stats',
+  checkAuth(...Object.values(UserRole)),
+  AdminController.getStats
+);
+
 // -------------------- GET SINGLE ADMIN --------------------
 router.get(
   '/:id',

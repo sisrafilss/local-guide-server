@@ -24,6 +24,18 @@ const getAllGuides = catchAsync(
   }
 );
 
+const getGuideStats = catchAsync(
+  async (req: Request & { user?: JwtPayload }, res: Response) => {
+    const result = await GuideService.getGuideStats();
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Guide Stats data fetched!',
+      data: result,
+    });
+  }
+);
 const getSingleGuideById = catchAsync(
   async (req: Request & { user?: JwtPayload }, res: Response) => {
     const { id } = req.params;
@@ -84,4 +96,5 @@ export const GuideController = {
   getSingleGuideById,
   deleteGuidetById,
   updateGuideById,
+  getGuideStats,
 };

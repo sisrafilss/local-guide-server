@@ -88,9 +88,27 @@ const deleteAdminById = catchAsync(
   }
 );
 
+const getStats = catchAsync(
+  async (req: Request & { user?: JwtPayload }, res: Response) => {
+    const { id, role } = req.user as JwtPayload;
+
+    console.log('USER', req.user);
+
+    const result = await AdminService.getStats(role, id);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Stats Get successfully',
+      data: result,
+    });
+  }
+);
+
 export const AdminController = {
   getAllAdmins,
   getSingleAdminById,
   updateAdminById,
   deleteAdminById,
+  getStats,
 };

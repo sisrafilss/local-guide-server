@@ -9,12 +9,7 @@ import { bookingSearchableFields } from './booking.constant';
 import { BookingService } from './booking.service';
 
 const createBooking = catchAsync(async (req: Request, res: Response) => {
-  const payload = {
-    ...req.body,
-    images: req.file?.path,
-  };
-
-  const result = await BookingService.createBooking(payload);
+  const result = await BookingService.createBooking(req.body);
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -96,10 +91,24 @@ const updateBookingById = catchAsync(
   }
 );
 
+const getBookingStatsForTourist = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await BookingService.getBookingStatsForTourist(req.body);
+
+    sendResponse(res, {
+      statusCode: httpStatus.CREATED,
+      success: true,
+      message: 'Booking Stats Fetched successfully',
+      data: result,
+    });
+  }
+);
+
 export const BookingController = {
   createBooking,
   getAllBookings,
   getBookingById,
   deleteBookingById,
   updateBookingById,
+  getBookingStatsForTourist,
 };

@@ -10,6 +10,7 @@ const router = express.Router();
 
 router.get('/', checkAuth(UserRole.ADMIN), GuideController.getAllGuides);
 
+router.get('/stats', checkAuth(UserRole.GUIDE), GuideController.getGuideStats);
 router.get(
   '/:id',
   checkAuth(UserRole.ADMIN),

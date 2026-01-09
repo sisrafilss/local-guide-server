@@ -325,10 +325,54 @@ const updateBookingById = async (
   return updatedBooking;
 };
 
+const getBookingStatsForTourist = async (userId: string) => {
+  // Current date for comparison
+  const now = new Date();
+
+  // Fetch all bookings for this tourist
+  const bookings = await prisma.booking.findMany({
+    where: {
+      tourist: {
+        userId: userId,
+      },
+    },
+    select: {
+      id: true,
+      status: true,
+      startAt: true,
+      endAt: true,
+      totalPrice: true,
+    },
+  });
+
+  const totalBookings = bookings.length;
+  const upcomingBookings = bookings.filter((b) => b.startAt > now).length;
+  const pastBookings = bookings.filter((b) => b.endAt && b.endAt < now).length;
+  const totalSpent = bookings.reduce(
+    (acc, b) => acc + b.totalPrice.toNumber(),
+    0
+  );
+
+  // Count bookings by status
+  const statusCounts: Record<string, number> = {};
+  bookings.forEach((b) => {
+    statusCounts[b.status] = (statusCounts[b.status] || 0) + 1;
+  });
+
+  return {
+    totalBookings,
+    upcomingBookings,
+    pastBookings,
+    totalSpent,
+    statusCounts,
+  };
+};
+
 export const BookingService = {
   createBooking,
   getAllBookings,
   getBookingById,
   deleteBookingById,
   updateBookingById,
+  getBookingStatsForTourist,
 };

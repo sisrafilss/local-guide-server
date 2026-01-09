@@ -14,6 +14,13 @@ router.post(
   validateRequest(CreateBookingZodSchema),
   BookingController.createBooking
 );
+// POST /api/booking
+router.get(
+  '/stats',
+  checkAuth(...Object.values(UserRole)),
+
+  BookingController.getBookingStatsForTourist
+);
 
 // GET /api/booking
 router.get(

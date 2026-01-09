@@ -41,7 +41,7 @@ const updateTour = catchAsync(
     sendResponse(res, {
       statusCode: httpStatus.CREATED,
       success: true,
-      message: 'Tour created successfully',
+      message: 'Tour updated successfully',
       data: result,
     });
   }

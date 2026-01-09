@@ -26,14 +26,14 @@ router.patch(
 // get /api/tours
 router.get(
   '/',
-  checkAuth(UserRole.GUIDE, UserRole.ADMIN),
+  // checkAuth(UserRole.GUIDE, UserRole.ADMIN),
   TourController.getAllTours
 );
 
 // get /api/tours
 router.get(
   '/:id',
-  checkAuth(...Object.values(UserRole)),
+  // checkAuth(...Object.values(UserRole)),
   TourController.getTourById
 );
 

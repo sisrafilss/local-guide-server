@@ -112,7 +112,7 @@ const changePassword = async (user: any, payload: any) => {
   });
 
   const isCorrectPassword: boolean = await bcrypt.compare(
-    payload.oldPassword,
+    payload.currentPassword,
     userData.password
   );
 

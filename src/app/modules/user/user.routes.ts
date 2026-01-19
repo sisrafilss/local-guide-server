@@ -25,6 +25,7 @@ router.post(
 // POST /api/users/create-guide
 router.post(
   '/create-guide',
+  checkAuth(UserRole.ADMIN),
   multerUpload.single('file'),
   validateRequest(createGuideSchema),
   UserController.createGuide

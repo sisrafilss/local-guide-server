@@ -92,8 +92,6 @@ const getStats = catchAsync(
   async (req: Request & { user?: JwtPayload }, res: Response) => {
     const { id, role } = req.user as JwtPayload;
 
-    console.log('USER', req.user);
-
     const result = await AdminService.getStats(role, id);
 
     sendResponse(res, {

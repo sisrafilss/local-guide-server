@@ -4,6 +4,9 @@ import ApiError from '../../errors/ApiError';
 import { IPaginationOptions } from '../../interfaces/pagination';
 import { prisma } from '../../shared/prisma';
 import { calculatePagination } from '../../utils/calculatePagination';
+import { generateTransactionId } from '../../utils/transactionId';
+import { ISSLCommerz } from '../SSLCommerz/sslCommerz.interface';
+import { SSLService } from '../SSLCommerz/sslCommerz.service';
 import { bookingSearchableFields } from './booking.constant';
 import {
   CreateBookingPayload,
@@ -24,53 +27,85 @@ const createBooking = async (payload: CreateBookingPayload) => {
     notes,
   } = payload;
 
-  const booking = await prisma.booking.create({
-    data: {
-      listingId,
-      touristId,
-      guideId,
-      userId,
-      startAt,
-      endAt,
-      totalPrice,
-      pax,
-      notes,
-      // status will default to PENDING
-    },
-    select: {
-      id: true,
-      status: true,
-      startAt: true,
-      endAt: true,
-      totalPrice: true,
-      pax: true,
-      listing: {
-        select: {
-          id: true,
-          title: true,
-        },
+  const bookingAndPaymentData = await prisma.$transaction(async (tnx) => {
+    const booking = await tnx.booking.create({
+      data: {
+        listingId,
+        touristId,
+        guideId,
+        userId,
+        startAt,
+        endAt,
+        totalPrice,
+        pax,
+        notes,
+        // status will default to PENDING
       },
-      guide: {
-        select: {
-          id: true,
-          user: {
-            select: {
-              id: true,
-              name: true,
+      select: {
+        id: true,
+        status: true,
+        startAt: true,
+        endAt: true,
+        totalPrice: true,
+        pax: true,
+        listing: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+        guide: {
+          select: {
+            id: true,
+            user: {
+              select: {
+                id: true,
+                name: true,
+              },
             },
           },
         },
-      },
-      tourist: {
-        select: {
-          id: true,
+        tourist: {
+          select: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                phone: true,
+                address: true,
+              },
+            },
+          },
         },
+        createdAt: true,
       },
-      createdAt: true,
-    },
+    });
+
+    const payment = await tnx.payment.create({
+      data: {
+        transactionId: generateTransactionId(),
+        amount: totalPrice,
+        bookingId: booking.id,
+      },
+    });
+
+    const sslPayload: ISSLCommerz = {
+      name: booking.tourist.user.name,
+      address: booking.tourist.user.address,
+      email: booking.tourist.user.email,
+      phoneNumber: booking.tourist.user.phone,
+      amount: totalPrice,
+      transactionId: payment.transactionId,
+    };
+
+    const sslPayment = await SSLService.sslPaymentInit(sslPayload);
+    // console.log(sslPayment);
+
+    return { booking, paymentUrl: sslPayment.GatewayPageURL };
   });
 
-  return booking;
+  return bookingAndPaymentData;
 };
 
 const getAllBookings = async (
@@ -239,14 +274,7 @@ const getBookingById = async (userId: string, bookingId: string) => {
           id: true,
         },
       },
-      payment: {
-        select: {
-          id: true,
-          amount: true,
-          status: true,
-          // method: true,
-        },
-      },
+      payment: true,
     },
   });
 

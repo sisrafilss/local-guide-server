@@ -10,6 +10,7 @@ model Booking {
   totalPrice  Decimal       @db.Decimal(10, 2)
   pax         Int           @default(1)
   notes       String?
+  paymentId   String?
 
   listing Listing  @relation(fields: [listingId], references: [id])
   tourist Tourist  @relation(fields: [touristId], references: [id])
@@ -23,6 +24,23 @@ model Booking {
   userId    String?
 
   @@map("bookings")
+}
+
+model Payment {
+  id        String  @id @default(uuid())
+  bookingId String  @unique
+  booking   Booking @relation(fields: [bookingId], references: [id])
+
+  amount             Float
+  transactionId      String        @unique
+  status             PaymentStatus @default(UNPAID)
+  paymentGatewayData Json?
+  invoiceUrl         String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("payments")
 }
 
 model Review {
@@ -39,22 +57,4 @@ model Review {
   reviewer User     @relation(fields: [reviewerId], references: [id])
 
   @@map("reviews")
-}
-
-model Payment {
-  id          String         @id @default(uuid())
-  bookingId   String         @unique
-  amount      Decimal        @db.Decimal(10, 2)
-  currency    String         @default("USD")
-  gateway     PaymentGateway
-  gatewayTxId String?
-  status      PaymentStatus  @default(INITIATED)
-  metadata    Json?
-
-  booking Booking @relation(fields: [bookingId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("payments")
 }

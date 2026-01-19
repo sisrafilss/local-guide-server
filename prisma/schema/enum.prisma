@@ -35,8 +35,9 @@ enum PaymentGateway {
 }
 
 enum PaymentStatus {
-  INITIATED
-  SUCCEEDED
+  UNPAID
+  PAID
+  CALCELLED
   FAILED
   REFUNDED
 }

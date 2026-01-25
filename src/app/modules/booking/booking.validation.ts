@@ -5,10 +5,6 @@ export const CreateBookingZodSchema = z.object({
     message: 'Invalid listingId',
   }),
 
-  touristId: z.uuid({
-    message: 'Invalid touristId',
-  }),
-
   guideId: z.uuid({
     message: 'Invalid guideId',
   }),

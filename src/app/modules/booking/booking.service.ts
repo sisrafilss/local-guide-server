@@ -16,96 +16,115 @@ import {
 
 const createBooking = async (payload: CreateBookingPayload) => {
   const {
-    listingId,
-    touristId,
     guideId,
     userId,
     startAt,
     endAt,
     totalPrice,
+    listingId,
     pax = 1,
     notes,
   } = payload;
 
-  const bookingAndPaymentData = await prisma.$transaction(async (tnx) => {
-    const booking = await tnx.booking.create({
-      data: {
-        listingId,
-        touristId,
-        guideId,
-        userId,
-        startAt,
-        endAt,
-        totalPrice,
-        pax,
-        notes,
-        // status will default to PENDING
+  try {
+    const userData = await prisma.user.findFirst({
+      where: {
+        id: userId,
       },
       select: {
-        id: true,
-        status: true,
-        startAt: true,
-        endAt: true,
-        totalPrice: true,
-        pax: true,
-        listing: {
-          select: {
-            id: true,
-            title: true,
-          },
-        },
-        guide: {
-          select: {
-            id: true,
-            user: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
-          },
-        },
         tourist: {
           select: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-                phone: true,
-                address: true,
+            id: true,
+          },
+        },
+      },
+    });
+
+    if (!userData?.tourist?.id) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Tourist id not found');
+    }
+    const touristId = userData?.tourist?.id;
+
+    return await prisma.$transaction(async (tnx) => {
+      const booking = await tnx.booking.create({
+        data: {
+          listingId,
+          touristId,
+          guideId,
+          userId,
+          startAt,
+          endAt,
+          totalPrice,
+          pax,
+          notes,
+          // status will default to PENDING
+        },
+        select: {
+          id: true,
+          status: true,
+          startAt: true,
+          endAt: true,
+          totalPrice: true,
+          pax: true,
+          listing: {
+            select: {
+              id: true,
+              title: true,
+            },
+          },
+          guide: {
+            select: {
+              id: true,
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                },
               },
             },
           },
+          tourist: {
+            select: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true,
+                  phone: true,
+                  address: true,
+                },
+              },
+            },
+          },
+          createdAt: true,
         },
-        createdAt: true,
-      },
-    });
+      });
 
-    const payment = await tnx.payment.create({
-      data: {
-        transactionId: generateTransactionId(),
+      const payment = await tnx.payment.create({
+        data: {
+          transactionId: generateTransactionId(),
+          amount: totalPrice,
+          bookingId: booking.id,
+        },
+      });
+
+      const sslPayload: ISSLCommerz = {
+        name: booking.tourist.user.name,
+        address: booking.tourist.user.address,
+        email: booking.tourist.user.email,
+        phoneNumber: booking.tourist.user.phone,
         amount: totalPrice,
-        bookingId: booking.id,
-      },
+        transactionId: payment.transactionId,
+      };
+
+      const sslPayment = await SSLService.sslPaymentInit(sslPayload);
+
+      return { booking, paymentUrl: sslPayment.GatewayPageURL };
     });
-
-    const sslPayload: ISSLCommerz = {
-      name: booking.tourist.user.name,
-      address: booking.tourist.user.address,
-      email: booking.tourist.user.email,
-      phoneNumber: booking.tourist.user.phone,
-      amount: totalPrice,
-      transactionId: payment.transactionId,
-    };
-
-    const sslPayment = await SSLService.sslPaymentInit(sslPayload);
-    // console.log(sslPayment);
-
-    return { booking, paymentUrl: sslPayment.GatewayPageURL };
-  });
-
-  return bookingAndPaymentData;
+  } catch (error: any) {
+    console.error(error);
+    throw new ApiError(httpStatus.BAD_REQUEST, error.message);
+  }
 };
 
 const getAllBookings = async (

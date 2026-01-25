@@ -8,16 +8,19 @@ import sendResponse from '../../utils/sendResponse';
 import { bookingSearchableFields } from './booking.constant';
 import { BookingService } from './booking.service';
 
-const createBooking = catchAsync(async (req: Request, res: Response) => {
-  const result = await BookingService.createBooking(req.body);
+const createBooking = catchAsync(
+  async (req: Request & { user?: JwtPayload }, res: Response) => {
+    const userId = req.user?.id;
+    const result = await BookingService.createBooking({ userId, ...req.body });
 
-  sendResponse(res, {
-    statusCode: httpStatus.CREATED,
-    success: true,
-    message: 'Booking created successfully',
-    data: result,
-  });
-});
+    sendResponse(res, {
+      statusCode: httpStatus.CREATED,
+      success: true,
+      message: 'Booking created successfully',
+      data: result,
+    });
+  }
+);
 
 const getAllBookings = catchAsync(
   async (req: Request & { user?: JwtPayload }, res: Response) => {

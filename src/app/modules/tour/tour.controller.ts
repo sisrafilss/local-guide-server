@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
+import { JwtPayload } from 'jsonwebtoken';
 import { IAuthUser } from '../../interfaces/common';
 import catchAsync from '../../utils/catchAsync';
 import pick from '../../utils/pick';
@@ -7,21 +8,25 @@ import sendResponse from '../../utils/sendResponse';
 import { tourFilterableFields } from './tour.constant';
 import { TourService } from './tour.service';
 
-const createTour = catchAsync(async (req: Request, res: Response) => {
-  const payload = {
-    ...req.body,
-    images: req.file?.path,
-  };
+const createTour = catchAsync(
+  async (req: Request & { user?: JwtPayload }, res: Response) => {
+    const payload = {
+      ...req.body,
+      imageURL: req.file?.path,
+    };
 
-  const result = await TourService.createTour(payload);
+    console.log('USER', req.user);
 
-  sendResponse(res, {
-    statusCode: httpStatus.CREATED,
-    success: true,
-    message: 'Tour created successfully',
-    data: result,
-  });
-});
+    const result = await TourService.createTour(req.user, payload);
+
+    sendResponse(res, {
+      statusCode: httpStatus.CREATED,
+      success: true,
+      message: 'Tour created successfully',
+      data: result,
+    });
+  }
+);
 
 const updateTour = catchAsync(
   async (req: Request & { user?: IAuthUser }, res: Response) => {

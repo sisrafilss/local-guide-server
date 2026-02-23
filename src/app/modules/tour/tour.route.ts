@@ -1,5 +1,6 @@
 import { UserRole } from '@prisma/client';
 import express from 'express';
+import { multerUpload } from '../../../config/multer.config';
 import checkAuth from '../../middlewares/checkAuth';
 import { validateRequest } from '../../middlewares/validateRequest';
 import { TourController } from './tour.controller';
@@ -11,6 +12,7 @@ const router = express.Router();
 router.post(
   '/',
   checkAuth(UserRole.GUIDE),
+  multerUpload.single('file'),
   validateRequest(CreateTourZodSchema),
   TourController.createTour
 );

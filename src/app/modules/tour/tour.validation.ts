@@ -13,8 +13,6 @@ export const TourCategoryEnm = z.enum([
 export const CreateTourZodSchema = z.object({
   id: z.uuid().optional(),
 
-  guideId: z.string(),
-
   title: z.string().min(5, 'Title must be at least 5 characters').max(120),
 
   description: z.string().min(20, 'Description must be at least 20 characters'),
@@ -37,7 +35,7 @@ export const CreateTourZodSchema = z.object({
 
   lng: z.coerce.number().min(-180).max(180).optional(),
 
-  images: z.array(z.string().url('Invalid image URL')).optional(),
+  imageURL: z.string().optional(),
 
   active: z.boolean().optional().default(true),
 });
@@ -65,7 +63,7 @@ export const UpdateTourZodSchema = z.object({
 
   lng: z.coerce.number().min(-180).max(180).optional(),
 
-  images: z.array(z.string().url()).optional(),
+  imageURL: z.string().optional(),
 
   active: z.boolean().optional(),
 });

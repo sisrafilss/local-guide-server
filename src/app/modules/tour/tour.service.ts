@@ -1,4 +1,5 @@
 import { Listing, Prisma, PrismaClient, UserStatus } from '@prisma/client';
+import { JwtPayload } from 'jsonwebtoken';
 import { IPaginationOptions } from '../../interfaces/pagination';
 import { calculatePagination } from '../../utils/calculatePagination';
 import { tourSearchableFields } from './tour.constant';
@@ -7,21 +8,26 @@ import { CreateTourInput, UpdateTourInput } from './tour.validation';
 
 const prisma = new PrismaClient();
 
-export const createTour = async (payload: CreateTourInput) => {
-  const { guideId, images, ...listingData } = payload;
+export const createTour = async (
+  user: JwtPayload,
+  payload: CreateTourInput
+) => {
+  const guide = await prisma.guide.findUniqueOrThrow({
+    where: {
+      userId: user.id,
+    },
+  });
+
+  console.log('GUIDE', guide);
+
+  const { imageURL, ...listingData } = payload;
 
   const tour = await prisma.listing.create({
     data: {
       ...listingData,
-      guideId,
+      guideId: guide.id,
 
-      images: images?.length
-        ? {
-            create: images.map((url) => ({
-              url,
-            })),
-          }
-        : undefined,
+      imageURL: imageURL?.length ? imageURL : undefined,
     },
 
     include: {
@@ -125,6 +131,7 @@ const getAllTours = async (
       title: true,
       description: true,
       price: true,
+      imageURL: true,
       durationMin: true,
       meetingPoint: true,
       maxGroupSize: true,
@@ -133,7 +140,6 @@ const getAllTours = async (
       lat: true,
       lng: true,
       active: true,
-      images: true,
       guide: {
         select: {
           id: true,

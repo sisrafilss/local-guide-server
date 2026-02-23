@@ -21,6 +21,7 @@ router.post(
 router.patch(
   '/:id',
   checkAuth(UserRole.GUIDE),
+  multerUpload.single('file'),
   validateRequest(UpdateTourZodSchema),
   TourController.updateTour
 );

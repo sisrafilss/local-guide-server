@@ -55,7 +55,6 @@ const updateTour = async (
   guideUserId: string,
   payload: UpdateTourInput
 ) => {
-  console.log('GUIDE USER ID IN SERVICE', guideUserId);
   const user = await prisma.user.findUniqueOrThrow({
     where: { id: guideUserId, status: UserStatus.ACTIVE },
     select: { guide: { select: { id: true } } },
@@ -70,18 +69,12 @@ const updateTour = async (
     where: { id: tourId, guideId: user.guide.id },
   });
 
-  const { images, ...rest } = payload;
+  // const { images, ...rest } = payload;
 
   const updatedTour = await prisma.listing.update({
     where: { id: tourId },
     data: {
-      ...rest,
-      ...(images && {
-        images: {
-          deleteMany: {}, // remove existing images
-          create: images.map((url) => ({ url })),
-        },
-      }),
+      ...payload,
     },
   });
 

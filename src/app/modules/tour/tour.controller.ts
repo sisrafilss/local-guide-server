@@ -17,7 +17,10 @@ const createTour = catchAsync(
 
     console.log('USER', req.user);
 
-    const result = await TourService.createTour(req.user, payload);
+    const result = await TourService.createTour(
+      req.user as JwtPayload,
+      payload
+    );
 
     sendResponse(res, {
       statusCode: httpStatus.CREATED,
@@ -35,6 +38,7 @@ const updateTour = catchAsync(
 
     const payload = {
       ...req.body,
+      imageURL: req.file?.path,
     };
 
     const result = await TourService.updateTour(

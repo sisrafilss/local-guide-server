@@ -8,6 +8,8 @@ import { tourRoutes } from '../modules/tour/tour.route';
 import { touristRoutes } from '../modules/tourist/tourist.route';
 import { userRoutes } from '../modules/user/user.routes';
 
+import { AIRoutes } from '../modules/ai/ai.route';
+
 const router = express.Router();
 
 const moduleRoutes = [
@@ -42,6 +44,10 @@ const moduleRoutes = [
   {
     path: '/payment',
     route: paymentRoutes,
+  },
+  {
+    path: '/ai',
+    route: AIRoutes,
   },
 ];
 

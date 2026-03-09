@@ -1,37 +1,26 @@
-import OpenAI from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import config from '../../../config';
 
-// Initialize OpenAI client with the API key from environment variables
-const openai = new OpenAI({
-  apiKey: config.openai_api_key,
-  timeout: 60 * 1000, // 60 seconds timeout
-  maxRetries: 3,      // Automatically retry on connection errors
-});
+// Initialize Google Generative AI with the API key
+const genAI = new GoogleGenerativeAI(config.gemini_api_key as string);
+const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
 /**
- * Summarize the provided text using OpenAI's gpt-4o-mini model.
+ * Summarize the provided text using Google's gemini-1.5-flash model.
  * The summary should be 3-4 concise sentences.
  */
 const summarizeText = async (text: string): Promise<string> => {
   try {
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        {
-          role: 'system',
-          content: 'You are a helpful assistant that summarizes text. Summarize the following text in 3–4 concise sentences.',
-        },
-        {
-          role: 'user',
-          content: text,
-        },
-      ],
-    });
+    const prompt = `Summarize the following text in 3–4 concise sentences:\n\n${text}`;
 
-    return response.choices[0]?.message?.content || 'Failed to generate summary';
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const summary = response.text();
+
+    return summary || 'Failed to generate summary';
   } catch (error: any) {
-    console.error('OpenAI Error:', error);
-    throw error; // Let the controller catch it with the full error info
+    console.error('Gemini API Error:', error);
+    throw error;
   }
 };
 

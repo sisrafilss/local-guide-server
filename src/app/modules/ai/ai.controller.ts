@@ -3,12 +3,13 @@ import catchAsync from '../../utils/catchAsync';
 import { AIService } from './ai.service';
 
 /**
- * Controller to handle text summarization requests.
+ * Controller to handle text summarization requests using Google Gemini.
+ * Replaces the previous OpenAI implementation while maintaining the same API interface.
  */
 const summarizeText = catchAsync(async (req: Request, res: Response) => {
   const { text } = req.body;
 
-  // Validate that "text" is not empty
+  // 1. Validate that "text" is not empty
   if (!text || typeof text !== 'string' || text.trim().length === 0) {
     return res.status(400).json({
       success: false,
@@ -17,20 +18,21 @@ const summarizeText = catchAsync(async (req: Request, res: Response) => {
   }
 
   try {
-    // Generate summary using the AI service
+    // 2. Generate summary using the Gemini-powered AI service
     const summary = await AIService.summarizeText(text);
 
-    // Return the response in the requested format
+    // 3. Return the response in the existing format (success: true, summary: "...")
     res.status(200).json({
       success: true,
       summary: summary,
     });
   } catch (error: any) {
-    // Handle potential OpenAI or other errors
+    // 4. Handle potential API or connection errors
+    // Status 500 maintains consistency with the previous error handling
     res.status(500).json({
       success: false,
       message: 'Failed to generate summary',
-      error: error.message
+      error: error.message, // Include error message for easier debugging
     });
   }
 });

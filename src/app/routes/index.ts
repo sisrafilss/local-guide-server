@@ -2,6 +2,7 @@ import express from 'express';
 import { adminRoutes } from '../modules/admin/admin.route';
 import { authRouter } from '../modules/auth/auth.route';
 import { bookingRoutes } from '../modules/booking/booking.route';
+import { dashboardRoutes } from '../modules/dashboard/dashboard.route';
 import { guideRoutes } from '../modules/guide/guide.route';
 import { paymentRoutes } from '../modules/payment/payment.route';
 import { tourRoutes } from '../modules/tour/tour.route';
@@ -48,6 +49,10 @@ const moduleRoutes = [
   {
     path: '/ai',
     route: AIRoutes,
+  },
+  {
+    path: '/dashboard',
+    route: dashboardRoutes,
   },
 ];
 

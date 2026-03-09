@@ -37,7 +37,7 @@ enum PaymentGateway {
 enum PaymentStatus {
   UNPAID
   PAID
-  CALCELLED
+  CANCELLED
   FAILED
   REFUNDED
 }

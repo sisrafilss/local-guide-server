@@ -136,7 +136,7 @@ const cancelPayment = async (query: Record<string, string>) => {
         transactionId: query.transactionId,
       },
       data: {
-        status: PaymentStatus.CALCELLED,
+        status: PaymentStatus.CANCELLED,
       },
     });
 

@@ -6,6 +6,38 @@
 -- the enum.
 
 
-ALTER TYPE "PaymentStatus" ADD VALUE 'CALCELLED';
-ALTER TYPE "PaymentStatus" ADD VALUE 'FAILED';
-ALTER TYPE "PaymentStatus" ADD VALUE 'REFUNDED';
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_enum
+        WHERE enumlabel = 'CALCELLED'
+    ) THEN
+        ALTER TYPE "PaymentStatus" ADD VALUE 'CALCELLED';
+    END IF;
+END
+$$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_enum
+        WHERE enumlabel = 'FAILED'
+    ) THEN
+        ALTER TYPE "PaymentStatus" ADD VALUE 'FAILED';
+    END IF;
+END
+$$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_enum
+        WHERE enumlabel = 'REFUNDED'
+    ) THEN
+        ALTER TYPE "PaymentStatus" ADD VALUE 'REFUNDED';
+    END IF;
+END
+$$;

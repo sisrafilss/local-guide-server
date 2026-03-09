@@ -5,7 +5,8 @@
   "author": "Israfil Hossen",
   "license": "MIT",
   "prisma": {
-    "schema": "./prisma/schema"
+    "schema": "./prisma/schema",
+    "migrations": "./prisma/schema/migrations"
   },
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only ./src/server.ts",

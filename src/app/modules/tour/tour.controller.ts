@@ -42,7 +42,7 @@ const updateTour = catchAsync(
     };
 
     const result = await TourService.updateTour(
-      tourId,
+      tourId as string,
       guideId as string,
       payload
     );
@@ -73,7 +73,7 @@ const getAllTours = catchAsync(async (req: Request, res: Response) => {
 
 const getTourById = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const result = await TourService.getTourById(id);
+  const result = await TourService.getTourById(id as string);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -84,7 +84,7 @@ const getTourById = catchAsync(async (req: Request, res: Response) => {
 
 const deleteTourById = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const result = await TourService.deleteTourById(id);
+  const result = await TourService.deleteTourById(id as string);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

@@ -28,11 +28,14 @@ const summarizeText = catchAsync(async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     // 4. Handle potential API or connection errors
-    // Status 500 maintains consistency with the previous error handling
-    res.status(500).json({
+    const isRateLimit = error.message?.includes('429') || error.status === 429;
+    
+    res.status(isRateLimit ? 429 : 500).json({
       success: false,
-      message: 'Failed to generate summary',
-      error: error.message, // Include error message for easier debugging
+      message: isRateLimit 
+        ? 'Too many requests. Please wait a moment before trying again.' 
+        : 'Failed to generate summary',
+      error: error.message,
     });
   }
 });

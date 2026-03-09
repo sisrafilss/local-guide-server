@@ -6,7 +6,7 @@ import { SSLService } from '../SSLCommerz/sslCommerz.service';
 import { PaymentService } from './payment.service';
 
 const initPayment = catchAsync(async (req: Request, res: Response) => {
-  const bookingId = req.params.bookingId;
+  const bookingId = req.params.bookingId as string;
   const result = await PaymentService.initPayment(bookingId);
 
   sendResponse(res, {

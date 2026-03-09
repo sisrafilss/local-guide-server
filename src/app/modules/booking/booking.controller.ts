@@ -48,7 +48,7 @@ const getBookingById = catchAsync(
     const { id } = req.params;
     const result = await BookingService.getBookingById(
       req?.user?.id as string,
-      id
+      id as string
     );
     sendResponse(res, {
       statusCode: httpStatus.OK,
@@ -62,7 +62,7 @@ const getBookingById = catchAsync(
 const deleteBookingById = catchAsync(
   async (req: Request & { user?: JwtPayload }, res: Response) => {
     const { id } = req.params;
-    await BookingService.deleteBookingById(req?.user?.id as string, id);
+    await BookingService.deleteBookingById(req?.user?.id as string, id as string);
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
@@ -80,7 +80,7 @@ const updateBookingById = catchAsync(
     };
 
     const result = await BookingService.updateBookingById(
-      id,
+      id as string,
       req?.user?.id as string,
       payload
     );

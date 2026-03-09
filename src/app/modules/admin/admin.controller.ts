@@ -34,7 +34,7 @@ const getSingleAdminById = catchAsync(
   async (req: Request & { user?: JwtPayload }, res: Response) => {
     const { id } = req.params;
 
-    const result = await AdminService.getSingleAdminById(id);
+    const result = await AdminService.getSingleAdminById(id as string);
 
     sendResponse(res, {
       statusCode: httpStatus.OK,
@@ -55,7 +55,7 @@ const updateAdminById = catchAsync(
     const { id } = req.params;
 
     const result = await AdminService.updateAdminById(
-      id,
+      id as string,
       payload,
       req.user as JwtPayload
     );
@@ -75,7 +75,7 @@ const deleteAdminById = catchAsync(
     const { id } = req.params;
 
     const result = await AdminService.deleteAdminById(
-      id,
+      id as string,
       req.user as JwtPayload
     );
 

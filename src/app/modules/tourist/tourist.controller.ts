@@ -11,7 +11,7 @@ const getSingleTouristById = catchAsync(
   async (req: Request & { user?: JwtPayload }, res: Response) => {
     const { id } = req.params;
 
-    const result = await TouristService.getSingleTouristById(id);
+    const result = await TouristService.getSingleTouristById(id as string);
 
     sendResponse(res, {
       statusCode: httpStatus.OK,
@@ -48,7 +48,7 @@ const updateTouristById = catchAsync(
     const { id } = req.params;
 
     const result = await TouristService.updateTouristById(
-      id,
+      id as string,
       payload,
       req.user as JwtPayload
     );
@@ -66,7 +66,7 @@ const deleteTouristById = catchAsync(
     const { id } = req.params;
 
     const result = await TouristService.deleteTouristById(
-      id,
+      id as string,
       req.user as JwtPayload
     );
     sendResponse(res, {

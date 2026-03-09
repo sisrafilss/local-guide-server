@@ -72,7 +72,7 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
 const deleteUser = catchAsync(
   async (req: Request & { user?: JwtPayload }, res: Response) => {
     const result = await UserService.deleteUser(
-      req.params.id,
+      req.params.id as string,
       req.user as JwtPayload
     );
 

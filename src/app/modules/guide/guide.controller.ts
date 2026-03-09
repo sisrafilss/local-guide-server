@@ -40,7 +40,7 @@ const getSingleGuideById = catchAsync(
   async (req: Request & { user?: JwtPayload }, res: Response) => {
     const { id } = req.params;
 
-    const result = await GuideService.getSingleGuideById(id);
+    const result = await GuideService.getSingleGuideById(id as string);
 
     sendResponse(res, {
       statusCode: httpStatus.OK,
@@ -60,7 +60,7 @@ const updateGuideById = catchAsync(
     const { id } = req.params;
 
     const result = await GuideService.updateGuideById(
-      id,
+      id as string,
       payload,
       req.user as JwtPayload
     );
@@ -79,7 +79,7 @@ const deleteGuidetById = catchAsync(
 
     const { id } = req.params;
     const result = await GuideService.deleteGuidetById(
-      id,
+      id as string,
       req.user as JwtPayload
     );
     sendResponse(res, {

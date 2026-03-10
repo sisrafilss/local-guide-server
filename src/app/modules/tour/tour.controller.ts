@@ -8,6 +8,23 @@ import sendResponse from '../../utils/sendResponse';
 import { tourFilterableFields } from './tour.constant';
 import { TourService } from './tour.service';
 
+const getMyTours = catchAsync(
+  async (req: Request & { user?: IAuthUser }, res: Response) => {
+    const guideId = req.user?.id;
+    const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
+
+    const result = await TourService.getMyTours(guideId as string, options);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'My tours fetched successfully',
+      meta: result.meta,
+      data: result.data,
+    });
+  }
+);
+
 const createTour = catchAsync(
   async (req: Request & { user?: JwtPayload }, res: Response) => {
     const payload = {
@@ -94,6 +111,7 @@ const deleteTourById = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const TourController = {
+  getMyTours,
   createTour,
   updateTour,
   getAllTours,

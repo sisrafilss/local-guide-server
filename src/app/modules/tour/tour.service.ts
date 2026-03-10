@@ -183,10 +183,73 @@ const deleteTourById = async (id: string): Promise<Listing> => {
   return result;
 };
 
+const getMyTours = async (guideId: string, options: IPaginationOptions) => {
+  const { page, limit, skip } = calculatePagination(options);
+
+  const guide = await prisma.user.findUniqueOrThrow({
+    where: {
+      id: guideId,
+    },
+    include: {
+      guide: true,
+    },
+  });
+
+  console.log(guide);
+
+  const result = await prisma.listing.findMany({
+    where: { guideId: guide.guide!.id },
+    skip,
+    take: limit,
+    orderBy: { createdAt: 'desc' },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      price: true,
+      imageURL: true,
+      durationMin: true,
+      meetingPoint: true,
+      maxGroupSize: true,
+      category: true,
+      city: true,
+      lat: true,
+      lng: true,
+      active: true,
+      guide: {
+        select: {
+          id: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+              profilePicUrl: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const total = await prisma.listing.count({
+    where: { guideId: guide.guide!.id },
+  });
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
+};
+
 export const TourService = {
   createTour,
   updateTour,
   getAllTours,
   getTourById,
   deleteTourById,
+  getMyTours,
 };

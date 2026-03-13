@@ -1,21 +1,26 @@
+import { BookingStatus } from '@prisma/client';
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 import { JwtPayload } from 'jsonwebtoken';
 
 import catchAsync from '../../utils/catchAsync';
+import pick from '../../utils/pick';
 import sendResponse from '../../utils/sendResponse';
-import { TouristDashboardService } from './tourist-dashboard.service';
+import { TouristDashboardService, TouristBookingFilters } from './tourist-dashboard.service';
 
 const getMyBookings = catchAsync(
   async (req: Request & { user?: JwtPayload }, res: Response) => {
     const userId = req.user?.id as string;
-    const result = await TouristDashboardService.getMyBookings(userId);
+    const filters = pick(req.query, ['status', 'searchTerm', 'city', 'guideId']) as TouristBookingFilters;
+    const options = pick(req.query, ['page', 'limit', 'sortBy', 'sortOrder']);
+    const result = await TouristDashboardService.getMyBookings(userId, filters, options);
 
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
       message: 'My bookings fetched successfully',
-      data: result,
+      meta: result.meta,
+      data: result.data,
     });
   }
 );

@@ -1,17 +1,72 @@
+import { BookingStatus, Prisma } from '@prisma/client';
 import httpStatus from 'http-status';
 import ApiError from '../../errors/ApiError';
+import { IPaginationOptions } from '../../interfaces/pagination';
 import { prisma } from '../../shared/prisma';
+import { calculatePagination } from '../../utils/calculatePagination';
 
-const getMyBookings = async (userId: string) => {
-  const bookings = await prisma.booking.findMany({
-    where: {
+export interface TouristBookingFilters {
+  status?: BookingStatus;
+  searchTerm?: string;
+  city?: string;
+  guideId?: string;
+}
+
+const getMyBookings = async (
+  userId: string,
+  filters: TouristBookingFilters,
+  options: IPaginationOptions
+) => {
+  const { page, limit, skip, sortBy, sortOrder } = calculatePagination(options);
+  const { status, searchTerm, city, guideId } = filters;
+
+  const andConditions: Prisma.BookingWhereInput[] = [
+    {
       tourist: {
         userId: userId,
       },
     },
-    orderBy: {
-      createdAt: 'desc',
-    },
+  ];
+
+  if (status) {
+    andConditions.push({ status });
+  }
+
+  if (searchTerm) {
+    andConditions.push({
+      listing: {
+        title: {
+          contains: searchTerm,
+          mode: 'insensitive',
+        },
+      },
+    });
+  }
+
+  if (city) {
+    andConditions.push({
+      listing: {
+        city: {
+          equals: city,
+          mode: 'insensitive',
+        },
+      },
+    });
+  }
+
+  if (guideId) {
+    andConditions.push({ guideId });
+  }
+
+  const whereConditions: Prisma.BookingWhereInput = {
+    AND: andConditions,
+  };
+
+  const bookings = await prisma.booking.findMany({
+    where: whereConditions,
+    skip,
+    take: limit,
+    orderBy: sortBy && sortOrder ? { [sortBy]: sortOrder } : { createdAt: 'desc' },
     select: {
       id: true,
       status: true,
@@ -44,7 +99,18 @@ const getMyBookings = async (userId: string) => {
     },
   });
 
-  return bookings;
+  const total = await prisma.booking.count({
+    where: whereConditions,
+  });
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: bookings,
+  };
 };
 
 const getMyBookingById = async (userId: string, bookingId: string) => {

@@ -23,4 +23,16 @@ router.patch(
   TouristDashboardController.cancelMyBooking
 );
 
+router.get(
+  '/guides',
+  checkAuth(UserRole.TOURIST),
+  TouristDashboardController.getMyGuides
+);
+
+router.get(
+  '/cities',
+  checkAuth(UserRole.TOURIST),
+  TouristDashboardController.getMyCities
+);
+
 export const touristDashboardRoutes = router;

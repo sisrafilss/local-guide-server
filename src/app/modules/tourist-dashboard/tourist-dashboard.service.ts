@@ -215,8 +215,65 @@ const cancelMyBooking = async (userId: string, bookingId: string) => {
   return cancelledBooking;
 };
 
+const getMyGuides = async (userId: string) => {
+  const bookings = await prisma.booking.findMany({
+    where: {
+      tourist: {
+        userId: userId,
+      },
+    },
+    select: {
+      guide: {
+        select: {
+          id: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+              profilePicUrl: true,
+              email: true,
+              phone: true,
+            },
+          },
+        },
+      },
+    },
+    distinct: ['guideId'],
+  });
+
+  const guides = bookings.map((b) => b.guide).filter(Boolean);
+  return guides;
+};
+
+const getMyCities = async (userId: string) => {
+  const bookings = await prisma.booking.findMany({
+    where: {
+      tourist: {
+        userId: userId,
+      },
+    },
+    select: {
+      listing: {
+        select: {
+          city: true,
+        },
+      },
+    },
+    distinct: ['listingId'],
+  });
+
+  const cities = bookings
+    .map((b) => b.listing?.city)
+    .filter(Boolean)
+    .filter((city, index, self) => self.indexOf(city) === index);
+
+  return cities;
+};
+
 export const TouristDashboardService = {
   getMyBookings,
   getMyBookingById,
   cancelMyBooking,
+  getMyGuides,
+  getMyCities,
 };

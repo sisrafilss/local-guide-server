@@ -58,8 +58,38 @@ const cancelMyBooking = catchAsync(
   }
 );
 
+const getMyGuides = catchAsync(
+  async (req: Request & { user?: JwtPayload }, res: Response) => {
+    const userId = req.user?.id as string;
+    const result = await TouristDashboardService.getMyGuides(userId);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'My guides fetched successfully',
+      data: result,
+    });
+  }
+);
+
+const getMyCities = catchAsync(
+  async (req: Request & { user?: JwtPayload }, res: Response) => {
+    const userId = req.user?.id as string;
+    const result = await TouristDashboardService.getMyCities(userId);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'My cities fetched successfully',
+      data: result,
+    });
+  }
+);
+
 export const TouristDashboardController = {
   getMyBookings,
   getMyBookingById,
   cancelMyBooking,
+  getMyGuides,
+  getMyCities,
 };

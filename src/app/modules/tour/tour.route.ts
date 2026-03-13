@@ -9,11 +9,7 @@ import { CreateTourZodSchema, UpdateTourZodSchema } from './tour.validation';
 const router = express.Router();
 
 // GET /api/tours/my-tours - Get all tours created by the authenticated guide
-router.get(
-  '/my-tours',
-  checkAuth(UserRole.GUIDE),
-  TourController.getMyTours
-);
+router.get('/my-tours', checkAuth(UserRole.GUIDE), TourController.getMyTours);
 
 // POST /api/tours
 router.post(
@@ -36,7 +32,7 @@ router.patch(
 // get /api/tours
 router.get(
   '/',
-  checkAuth(UserRole.GUIDE, UserRole.ADMIN),
+  // checkAuth(UserRole.GUIDE, UserRole.ADMIN),
   TourController.getAllTours
 );
 

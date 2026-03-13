@@ -7,6 +7,7 @@ import { guideRoutes } from '../modules/guide/guide.route';
 import { paymentRoutes } from '../modules/payment/payment.route';
 import { tourRoutes } from '../modules/tour/tour.route';
 import { touristRoutes } from '../modules/tourist/tourist.route';
+import { touristDashboardRoutes } from '../modules/tourist-dashboard/tourist-dashboard.route';
 import { userRoutes } from '../modules/user/user.routes';
 
 import { AIRoutes } from '../modules/ai/ai.route';
@@ -53,6 +54,10 @@ const moduleRoutes = [
   {
     path: '/dashboard',
     route: dashboardRoutes,
+  },
+  {
+    path: '/tourist-dashboard',
+    route: touristDashboardRoutes,
   },
 ];
 
